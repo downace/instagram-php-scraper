@@ -1,23 +1,27 @@
 {
-  "name": "raiym/instagram-php-scraper",
+  "name": "downace/instagram-php-scraper",
   "description": "Instagram PHP Scraper. Get account information, photos and videos without any authorization",
   "keywords": [
     "instagram",
     "scraper"
   ],
   "type": "library",
-  "homepage": "https://github.com/raiym/instagram-php-scraper",
+  "homepage": "https://github.com/downace/instagram-php-scraper",
   "license": "MIT",
   "authors": [
     {
-      "name": "raiym",
-      "email": "r.kapishev@gmail.com"
+      "name": "downace",
+      "email": "downace@users.noreply.github.com"
     }
   ],
   "require": {
     "php": ">=5.4.0",
-    "mashape/unirest-php": "3.0.*",
+    "ext-json": "*",
     "phpFastCache/phpFastCache": "5.0.*"
+  },
+  "suggest": {
+    "mashape/unirest-php": "HTTP client",
+    "guzzlehttp/guzzle": "HTTP client"
   },
   "require-dev": {
     "phpunit/phpunit": "5.5.*"
@@ -26,8 +30,5 @@
     "psr-0": {
       "InstagramScraper": "src"
     }
-  },
-  "support": {
-    "email": "r.kapishev@gmail.com"
   }
 }

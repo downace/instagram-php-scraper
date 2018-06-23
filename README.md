@@ -1,62 +1,79 @@
 # Instagram PHP Scrapper
-This library based on Instagram web version. We develop it because nowadays it is hard to get approved Instagram application. 
-The purpose support every feature that web desktop and mobile version support. 
 
-## Code Example
-```php
-$instagram = Instagram::withCredentials('username', 'password');
-$instagram->login();
-$account = $instagram->getAccountById(3);
-echo $account->getUsername();
-```
-Some methods does not require auth: 
-```php
-$instagram = new Instagram();
-$nonPrivateAccountMedias = $instagram->getMedias('kevin');
-echo $nonPrivateAccountMedias[0]->getLink();
-```
-If you use auth it is recommended to cash user session, in this case you don't need run `$instagram->login()` method every time your program runs:
+This is the fork of [`postaddictme/instagram-php-scraper`](https://github.com/postaddictme/instagram-php-scraper) repo.
+Description from original:
 
-```php
-$instagram = Instagram::withCredentials('username', 'password', '/path/to/cache/folder/');
-$instagram->login(); // will use cached session if you can force login $instagram->login(true)
-$account = $instagram->getAccountById(3);
-echo $account->getUsername();
-```
-Using proxy for requests:
+> This library based on Instagram web version. We develop it because nowadays it is hard to get approved Instagram application. 
+> The purpose support every feature that web desktop and mobile version support. 
 
-```php
-$instagram = new Instagram();
-Instagram::setProxy([
-    'address' => '111.112.113.114',
-    'port'    => '8080',
-    'tunnel'  => true,
-    'timeout' => 30,
-]);
-// Request with proxy
-$account = $instagram->getAccount('kevin');
-Instagram::disableProxy();
-// Request without proxy
-$account = $instagram->getAccount('kevin');
-```
+
+## Fork Information
+
+This fork provides ability to specify custom HTTP client for handling requests.
+Clients for [`guzzlehttp/guzzle`](https://github.com/guzzle/guzzle) and
+[`mashape/unirest-php`](https://github.com/Mashape/unirest-php) are included.
+
+Also, proxy methods are removed from `Instagram` class: proxy should be configured for HTTP client
+(following the principle of separation of concerns) 
+
 
 ## Installation
 
 ### Using composer
 
-```sh
-composer.phar require raiym/instagram-php-scraper
-```
-or 
-```sh
-composer require raiym/instagram-php-scraper
+Add repository and specify version as follows:
+
+```json
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/downace/instagram-php-scraper"
+    }
+  ],
+  "require": {
+    "raiym/instagram-php-scraper": "dev-http-agnostic"
+  }
+}
 ```
 
 ### If you don't have composer
 You can download it [here](https://getcomposer.org/download/).
 
-## Examples
-See examples [here](https://github.com/postaddictme/instagram-php-scraper/tree/master/examples).
 
-## Other
-Java library: https://github.com/postaddictme/instagram-java-scraper
+## Examples
+
+You can see examples of using original library [here](https://github.com/postaddictme/instagram-php-scraper/tree/master/examples).
+
+With Unirest ([`mashape/unirest-php`](https://github.com/Mashape/unirest-php) is required):
+
+```php
+$insta = new Instagram(new \InstagramScraper\HttpClient\UnirestClient());
+```
+
+With Guzzle ([`guzzlehttp/guzzle`](https://github.com/guzzle/guzzle) is required):
+
+```php
+// \GuzzleHttp\Client with default options will be used
+$insta = new Instagram(new \InstagramScraper\HttpClient\GuzzleClient());
+
+// You can provide options for \GuzzleHttp\Client constructor
+$insta = new Instagram(new \InstagramScraper\HttpClient\GuzzleClient([ 'timeout' => 5 ]));
+
+// Or pass your own instance of \GuzzleHttp\ClientInterface:
+$insta = new Instagram(new \InstagramScraper\HttpClient\GuzzleClient($myClient));
+```
+
+Using proxy:
+
+```php
+// With Guzzle.
+$insta = new Instagram(new \InstagramScraper\HttpClient\GuzzleClient([
+    'proxy' => 'http://user:pass@localhost:8125'
+]));
+
+// With Unirest
+Request::proxy('localhost', 8125, CURLPROXY_HTTP);
+Request::proxyAuth('user', 'pass');
+$insta = new Instagram(new \InstagramScraper\HttpClient\UnirestClient());
+```
