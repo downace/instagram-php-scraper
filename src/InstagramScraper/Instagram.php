@@ -6,6 +6,7 @@ use InstagramScraper\Exception\InstagramAuthException;
 use InstagramScraper\Exception\InstagramException;
 use InstagramScraper\Exception\InstagramNotFoundException;
 use InstagramScraper\HttpClient\Client;
+use InstagramScraper\HttpClient\HttpException;
 use InstagramScraper\HttpClient\Response;
 use InstagramScraper\Model\Account;
 use InstagramScraper\Model\Comment;
@@ -52,14 +53,15 @@ class Instagram
     }
 
     /**
+     * @param Client $httpClient
      * @param string $username
      * @param string $password
-     * @param null $sessionFolder
+     * @param string $sessionFolder
      *
      * @return Instagram
      * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
      */
-    public static function withCredentials($username, $password, $sessionFolder = null)
+    public static function withCredentials(Client $httpClient, $username, $password, $sessionFolder = null)
     {
         if (is_null($sessionFolder)) {
             $sessionFolder = __DIR__ . DIRECTORY_SEPARATOR . 'sessions' . DIRECTORY_SEPARATOR;
@@ -73,7 +75,7 @@ class Instagram
         } else {
             static::$instanceCache = $sessionFolder;
         }
-        $instance = new self();
+        $instance = new self($httpClient);
         $instance->sessionUsername = $username;
         $instance->sessionPassword = $password;
         return $instance;
@@ -115,28 +117,6 @@ class Instagram
             $hashtags[] = Tag::create($jsonHashtag['hashtag']);
         }
         return $hashtags;
-    }
-
-    /**
-     * @param \stdClass|string $rawError
-     *
-     * @return string
-     */
-    private static function getErrorBody($rawError)
-    {
-        if (is_string($rawError)) {
-            return $rawError;
-        }
-        if (is_object($rawError)) {
-            $str = '';
-            foreach ($rawError as $key => $value) {
-                $str .= ' ' . $key . ' => ' . $value . ';';
-            }
-            return $str;
-        } else {
-            return 'Unknown body format';
-        }
-
     }
 
     /**
@@ -1175,9 +1155,7 @@ class Instagram
                 throw new InstagramException('Response code is ' . $response->getCode() . '. Body: ' . $response->getBody() . ' Something went wrong. Please report issue.');
             }
 			preg_match('/"csrf_token":"(.*?)"/', $response->getBody(), $match);
-			if(isset($match[1])) {
-				$csrfToken = $match[1];
-			}
+            $csrfToken = isset($match[1]) ? $match[1] : '';
 			$cookies = static::parseCookies($response->getHeader('Set-Cookie'));
             $mid = $cookies['mid'];
             $headers = ['cookie' => "csrftoken=$csrfToken; mid=$mid;",
@@ -1218,6 +1196,8 @@ class Instagram
      * @param $session
      *
      * @return bool
+     *
+     * @throws HttpException
      */
     public function isLoggedIn($session)
     {
@@ -1247,7 +1227,7 @@ class Instagram
      *
      * @return Response
      *
-     * @throws InstagramAuthException
+     * @throws InstagramException
      */
     private function verifyTwoStep(Response $response, $cookies)
     {
