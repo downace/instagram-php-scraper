@@ -39,7 +39,7 @@ class Instagram
     private $sessionPassword;
     private $userSession;
     private $rhxGis = null;
-    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.106 Safari/537.36';
+    private $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36';
     /** @var Client */
     private $httpClient;
 
@@ -50,7 +50,6 @@ class Instagram
     {
         $this->httpClient = $httpClient;
     }
-
 
     /**
      * @param string $username
@@ -1175,9 +1174,12 @@ class Instagram
             if (static::HTTP_OK !== $response->getCode()) {
                 throw new InstagramException('Response code is ' . $response->getCode() . '. Body: ' . $response->getBody() . ' Something went wrong. Please report issue.');
             }
-            $cookies = static::parseCookies($response->getHeader('Set-Cookie'));
+			preg_match('/"csrf_token":"(.*?)"/', $response->getBody(), $match);
+			if(isset($match[1])) {
+				$csrfToken = $match[1];
+			}
+			$cookies = static::parseCookies($response->getHeader('Set-Cookie'));
             $mid = $cookies['mid'];
-            $csrfToken = $cookies['csrftoken'];
             $headers = ['cookie' => "csrftoken=$csrfToken; mid=$mid;",
                 'referer' => Endpoints::BASE_URL . '/',
                 'x-csrftoken' => $csrfToken,
