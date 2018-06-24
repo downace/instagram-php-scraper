@@ -21,20 +21,8 @@ Also, proxy methods are removed from `Instagram` class: proxy should be configur
 
 ### Using composer
 
-Add repository and specify version as follows:
-
-```json
-{
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/downace/instagram-php-scraper"
-    }
-  ],
-  "require": {
-    "raiym/instagram-php-scraper": "dev-http-agnostic"
-  }
-}
+```sh
+composer require downace/instagram-php-scraper
 ```
 
 ### If you don't have composer
