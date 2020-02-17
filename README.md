@@ -1,4 +1,6 @@
-# Instagram PHP Scrapper
+# [ABANDONED] Instagram PHP Scrapper
+
+**This package is abandoned. Use original [postaddictme/instagram-php-scraper](https://github.com/postaddictme/instagram-php-scraper)**
 
 This is the fork of [`postaddictme/instagram-php-scraper`](https://github.com/postaddictme/instagram-php-scraper) repo.
 Description from original:
