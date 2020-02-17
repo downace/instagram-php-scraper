@@ -17,7 +17,7 @@
   "require": {
     "php": ">=5.6.0",
     "ext-json": "*",
-    "phpFastCache/phpFastCache": "5.0.*"
+    "phpfastcache/phpfastcache": "5.0.*"
   },
   "suggest": {
     "mashape/unirest-php": "HTTP client",
